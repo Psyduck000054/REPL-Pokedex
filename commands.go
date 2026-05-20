@@ -36,6 +36,14 @@ mapb: Shows the previous page of in-game locations
 #EXPLORE
 explore [area]: Shows all possible Pokemon encounters in the area
 
+#CATCH
+catch [pokemon]: Attempt to catch a Pokemon. The higher the BaseXP, the harder it is to catch
+
+#POKEDEX
+pokedex: Shows all Pokemon in your Pokedex
+check [pokemon]: Check if a Pokemon is in your Pokedex
+inspect [pokemon]: Shows the properties of a Pokemon in your Pokedex
+
 `)
 	return nil
 }
@@ -88,7 +96,7 @@ func commandMapb(c *config, useless0 string) error {
 func commandExplore(u *config, area string) error {
 	pokeSlice, err := u.pokeClient.ListPokemons(area)
 	if err != nil {
-		return err
+		return fmt.Errorf("%s is not a valid area address", area)
 	}
 
 	fmt.Printf("Exploring %s ...\n", area)
@@ -108,7 +116,7 @@ func commandExplore(u *config, area string) error {
 func commandCatch(c *config, p string) error {
 	pokemon, err := c.pokeClient.PropertiesRetrieval(p)
 	if err != nil {
-		return err
+		return fmt.Errorf("%s is not a Pokemon", p)
 	}
 
 	fmt.Printf("Throwing a Pokeball at %s...\n", p)
@@ -131,10 +139,72 @@ func commandCatch(c *config, p string) error {
 	if catchRate >= temp0 {
 		// caught
 		fmt.Printf("%s was caught!\n", p)
+		c.pokedex[p] = pokemon
 	} else {
 		// escape
 		fmt.Printf("%s escaped!\n", p)
 	}
 
+	return nil
+}
+
+// ---------------------------------------------------------
+// CHECK
+// ---------------------------------------------------------
+
+func commandCheck(c *config, p string) error {
+	_, ok := c.pokedex[p]
+	if !ok {
+		fmt.Printf("%s is not in your Pokedex\n", p)
+		return nil
+	} else {
+		fmt.Printf("%s is in your Pokedex!\n", p)
+	}
+
+	return nil
+}
+
+// ---------------------------------------------------------
+// INSPECT
+// ---------------------------------------------------------
+
+func commandInspect(c *config, p string) error {
+	pokemon, ok := c.pokedex[p]
+	if !ok {
+		fmt.Printf("%s is not in your Pokedex\n", p)
+		return nil
+	}
+
+	fmt.Printf("Name: %s\n", pokemon.Name)
+	fmt.Printf("Base XP: %d\n", pokemon.BaseXP)
+	fmt.Printf("Height: %d\n", pokemon.Height)
+	fmt.Printf("Weight: %d\n", pokemon.Weight)
+
+	fmt.Println("Stats:")
+	for _, stat := range pokemon.Stats {
+		fmt.Printf("- %s: %d\n", stat.Stat.Name, stat.BaseStat)
+	}
+
+	fmt.Println("Types:")
+	for _, t := range pokemon.Types {
+		fmt.Printf("- %s\n", t.TypeInfo.Name)
+	}
+
+	return nil
+}
+
+// ---------------------------------------------------------
+// POKEDEX
+// ---------------------------------------------------------
+
+func commandPokedex(c *config, useless0 string) error {
+
+	fmt.Print("Pokemon in your Pokedex: \n")
+
+	index := 1
+	for _, pokemon := range c.pokedex {
+		fmt.Printf("%d. %s\n", index, pokemon.Name)
+		index++
+	}
 	return nil
 }

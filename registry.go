@@ -41,4 +41,19 @@ var commandList = map[string]cliCommand{
 		desc:     "Attempt to catch a Pokemon!",
 		callback: commandCatch,
 	},
+	"check": {
+		name:     "check",
+		desc:     "Check the details of a Pokemon in your Pokedex",
+		callback: commandCheck,
+	},
+	"inspect": {
+		name:     "inspect",
+		desc:     "Check the details of a Pokemon in your Pokedex",
+		callback: commandInspect,
+	},
+	"pokedex": {
+		name:     "pokedex",
+		desc:     "List all Pokemon in your Pokedex",
+		callback: commandPokedex,
+	},
 }

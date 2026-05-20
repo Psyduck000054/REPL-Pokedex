@@ -1,12 +1,12 @@
 package pokeapi
 
-type Pokemon struct {
+type PokemonName struct {
 	Name string `json:"name"`
 	Url  string `json:"url"`
 }
 
 type PokeBall struct {
-	Container Pokemon `json:"pokemon"`
+	Container PokemonName `json:"pokemon"`
 }
 
 type AreaEncounterInfo struct {
